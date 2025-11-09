@@ -66,3 +66,43 @@
      ✔ Container elite-stack-api-1       Running                                                                        0.0s 
 Только единственное: удалите version в docker-compose.yaml. Оно у меня ругалось на поставленную актуальную версию. Docker поднимает по своей версии, так что ничего не будет. Теперь будет Запуск и небольшая проверка.
 # Запуск
+Проверяем работу локального хоста:
+
+    ┌──(vislav㉿No-V)-[~/Docker/Tech_of_Prog_2/materials/starter]
+    └─$ curl -s http://api.localhost/healthz
+    {"status":"ok"}  
+----
+    ┌──(vislav㉿No-V)-[~/Docker/Tech_of_Prog_2/materials/starter]
+    └─$ curl -s http://api.localhost/db     
+    {"db":1}  
+----
+    ┌──(vislav㉿No-V)-[~/Docker/Tech_of_Prog_2/materials/starter]
+    └─$ curl -s http://api.localhost/cache  
+    {"cache":"ok"} 
+----
+    ┌──(vislav㉿No-V)-[~/Docker/Tech_of_Prog_2/materials/starter]
+    └─$ docker compose ps           
+    NAME                     IMAGE                   COMMAND                  SERVICE    CREATED          STATUS                      PORTS
+    elite-stack-adminer-1    adminer:latest          "entrypoint.sh docke…"   adminer    42 minutes ago   Up 42 minutes               8080/tcp
+    elite-stack-api-1        elite-stack-api         "uvicorn app.main:ap…"   api        42 minutes ago   Up 42 minutes (healthy)     8000/tcp
+    elite-stack-postgres-1   postgres:16-alpine      "docker-entrypoint.s…"   postgres   42 minutes ago   Up 42 minutes (healthy)     
+    elite-stack-rabbitmq-1   rabbitmq:3-management   "docker-entrypoint.s…"   rabbitmq   42 minutes ago   Up 42 minutes (healthy)     
+    elite-stack-redis-1      redis:7-alpine          "docker-entrypoint.s…"   redis      42 minutes ago   Up 42 minutes               
+    elite-stack-traefik-1    traefik:v3.1            "/entrypoint.sh --ap…"   traefik    42 minutes ago   Up 42 minutes               0.0.0.0:80->80/tcp, :::80->80/tcp
+    elite-stack-worker-1     elite-stack-worker      "celery -A app.celer…"   worker     42 minutes ago   Up 42 minutes (unhealthy)   
+----
+    ┌──(vislav㉿No-V)-[~/Docker/Tech_of_Prog_2/materials/starter]
+    └─$ docker compose logs -f api
+    api-1  | INFO:     Started server process [1]
+    api-1  | INFO:     Waiting for application startup.
+    api-1  | INFO:     Application startup complete.
+    api-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+    api-1  | INFO:     172.21.0.3:47914 - "GET /health HTTP/1.1" 404 Not Found
+    api-1  | INFO:     172.21.0.3:47532 - "GET /healtz HTTP/1.1" 404 Not Found
+    api-1  | INFO:     172.21.0.3:50924 - "GET /db HTTP/1.1" 200 OK
+    api-1  | INFO:     172.21.0.3:45272 - "GET /cache HTTP/1.1" 200 OK
+    api-1  | INFO:     172.21.0.3:42222 - "GET /healthz HTTP/1.1" 200 OK
+    api-1  | INFO:     172.21.0.3:42222 - "GET /healthz HTTP/1.1" 200 OK
+    api-1  | INFO:     172.21.0.3:42222 - "GET /db HTTP/1.1" 200 OK
+    api-1  | INFO:     172.21.0.3:42222 - "GET /cache HTTP/1.1" 200 OK
+Как мы видим, всё работает корректно.
