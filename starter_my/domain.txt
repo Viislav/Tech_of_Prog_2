@@ -1,0 +1,2 @@
+http://traefik.localhost
+http://adminer.localhost:8081
